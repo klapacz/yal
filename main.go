@@ -16,7 +16,11 @@ func main() {
 			}
 			return
 		case "scan":
-			GetHeader("logarion.txt")
+			header, err := GetHeader("logarion.txt")
+			if err != nil {
+				log.Fatalf("Error parsing header: %s", err)
+			}
+			log.Println(header)
 			return
 		}
 	}

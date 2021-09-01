@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 	"time"
@@ -28,7 +27,10 @@ const timeFormat = time.RFC3339
 
 func (h *Header) ParseLine(text string) error {
 	parts := strings.Fields(text)
-	// TODO: fail if there is no second part
+	if len(parts) < 2 {
+		return fmt.Errorf("Header field '%s' has no value", parts[0])
+	}
+
 	switch parts[0] {
 	case "ID:":
 		h.ID = uuid.MustParse(parts[1])
@@ -64,27 +66,33 @@ func (h *Header) ParseLine(text string) error {
 	return nil
 }
 
-func GetHeader(filePath string) {
+func GetHeader(filePath string) (Header, error) {
 	header := Header{}
 
 	f, err := os.Open(filePath)
 	if err != nil {
-		log.Fatal(err)
+		return header, err
 	}
 	defer f.Close()
 
+	// read given file line by line
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		text := scanner.Text()
+		// stop scanning on empty line
 		if text == "" {
-			fmt.Printf("%+v\n", header)
-			return
+			break
 		}
-		header.ParseLine(text)
+
+		err := header.ParseLine(text)
+		if err != nil {
+			return header, err
+		}
 	}
 
-	// TODO: check what code below does
 	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+		return header, err
 	}
+
+	return header, nil
 }
