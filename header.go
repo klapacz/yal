@@ -66,6 +66,19 @@ func (h *Header) ParseLine(text string) error {
 	return nil
 }
 
+func (h *Header) ToString() string {
+	authors := ""
+	for _, a := range h.Authors {
+		authors += " " + a.Name + " " + a.Email
+	}
+
+	return "ID: " + h.ID.String() +
+		"\nTitle: " + h.Title +
+		"\nAuthors:" + authors +
+		"\nDate: " + h.Date.Format(timeFormat) +
+		"\nTopics: " + strings.Join(h.Topics, ",")
+}
+
 func GetHeader(filePath string) (Header, error) {
 	header := Header{}
 
