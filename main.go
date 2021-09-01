@@ -4,17 +4,21 @@ import (
 	"fmt"
 	"log"
 	"os"
-
-	"github.com/google/uuid"
 )
 
 func main() {
-	if len(os.Args) > 1 && os.Args[1] == "init" {
-		err := CreateConfig()
-		if err != nil {
-			log.Fatalf("Error creating configuration file: %s", err)
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "init":
+			err := CreateConfig()
+			if err != nil {
+				log.Fatalf("Error creating configuration file: %s", err)
+			}
+			return
+		case "scan":
+			GetHeader("logarion.txt")
+			return
 		}
-		return
 	}
 
 	config, err := GetConfig()
@@ -22,6 +26,5 @@ func main() {
 		log.Fatalf("Error reading configuration file: %s", err)
 	}
 
-	fmt.Println(uuid.New())
 	fmt.Println(config)
 }
