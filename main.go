@@ -4,31 +4,48 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
+
+const newFileName = "draft.md"
+
+func new() {
+	config := GetConfig()
+	header := NewHeaderFromConfig(config)
+	title := ""
+
+	if len(os.Args) > 2 {
+		title = strings.Join(os.Args[2:len(os.Args)], " ")
+	}
+
+	header.Title = title
+
+	err := os.WriteFile(newFileName, []byte(header.ToString()), 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func main() {
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
 		case "init":
-			err := CreateConfig()
+			err := InitConfig()
 			if err != nil {
 				log.Fatalf("Error creating configuration file: %s", err)
 			}
-			return
 		case "scan":
-			header, err := GetHeader("logarion.txt")
+			header, err := NewHeaderFromFile("logarion.txt")
 			if err != nil {
 				log.Fatalf("Error parsing header: %s", err)
 			}
 			log.Println(header)
-			return
+		case "new":
+			new()
 		}
+		return
 	}
 
-	config, err := GetConfig()
-	if err != nil {
-		log.Fatalf("Error reading configuration file: %s", err)
-	}
-
+	config := GetConfig()
 	fmt.Println(config)
 }

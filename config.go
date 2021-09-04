@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"os/user"
 
@@ -20,23 +21,27 @@ const configDir = ".yal/"
 const configFileName = "config.toml"
 const configFilePath = configDir + configFileName
 
-func GetConfig() (*Config, error) {
+func GetConfig() *Config {
+	throw := func(err error) {
+		log.Fatalf("Error reading configuration file: %s", err)
+	}
+
 	c := Config{}
 
 	dat, err := os.ReadFile(configFilePath)
 	if err != nil {
-		return &c, err
+		throw(err)
 	}
 
 	err = toml.Unmarshal(dat, &c)
 	if err != nil {
-		return &c, err
+		throw(err)
 	}
 
-	return &c, nil
+	return &c
 }
 
-func CreateConfig() error {
+func InitConfig() error {
 	var username string
 	// get current user name to use as default owner
 	user, err := user.Current()

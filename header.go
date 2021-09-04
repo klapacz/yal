@@ -79,7 +79,7 @@ func (h *Header) ToString() string {
 		"\nTopics: " + strings.Join(h.Topics, ",")
 }
 
-func GetHeader(filePath string) (Header, error) {
+func NewHeaderFromFile(filePath string) (Header, error) {
 	header := Header{}
 
 	f, err := os.Open(filePath)
@@ -108,4 +108,13 @@ func GetHeader(filePath string) (Header, error) {
 	}
 
 	return header, nil
+}
+
+func NewHeaderFromConfig(config *Config) *Header {
+	email, name := config.Archive.Email, config.Archive.Owner
+
+	return &Header{
+		ID:      uuid.New(),
+		Authors: []Author{{Name: name, Email: email}},
+	}
 }
