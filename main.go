@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -35,6 +36,26 @@ func new() {
 	}
 }
 
+func list() {
+	files, err := ioutil.ReadDir(".")
+	if err != nil {
+		log.Fatalf("Error reading list of files: %s", err)
+	}
+
+	for _, file := range files {
+		name := file.Name()
+		if file.IsDir() || !strings.HasSuffix(name, ".md") {
+			continue
+		}
+
+		header, err := NewHeaderFromFile(name)
+		if err != nil {
+			continue
+		}
+		fmt.Println(header.Title)
+	}
+}
+
 func main() {
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
@@ -43,12 +64,8 @@ func main() {
 			if err != nil {
 				log.Fatalf("Error creating configuration file: %s", err)
 			}
-		case "scan":
-			header, err := NewHeaderFromFile("logarion.txt")
-			if err != nil {
-				log.Fatalf("Error parsing header: %s", err)
-			}
-			log.Println(header)
+		case "list":
+			list()
 		case "new":
 			new()
 		}
