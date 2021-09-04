@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+const openWriteIfNotExists = os.O_WRONLY | os.O_CREATE | os.O_EXCL
+
 const newFileName = "draft.md"
 
 func new() {
@@ -14,15 +16,22 @@ func new() {
 	header := NewHeaderFromConfig(config)
 	title := ""
 
+	// get title from additional arguments
 	if len(os.Args) > 2 {
 		title = strings.Join(os.Args[2:len(os.Args)], " ")
 	}
 
 	header.Title = title
 
-	err := os.WriteFile(newFileName, []byte(header.ToString()), 0644)
+	// fail if file already exists
+	f, err := os.OpenFile(newFileName, openWriteIfNotExists, 0644)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("error creating new logarion file: %s", err)
+	}
+
+	_, err = f.Write([]byte(header.ToString()))
+	if err != nil {
+		log.Fatalf("error writing to created logarion file: %s", err)
 	}
 }
 

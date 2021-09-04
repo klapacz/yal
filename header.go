@@ -115,6 +115,7 @@ func NewHeaderFromConfig(config *Config) *Header {
 
 	return &Header{
 		ID:      uuid.New(),
+		Date:    time.Now(),
 		Authors: []Author{{Name: name, Email: email}},
 	}
 }

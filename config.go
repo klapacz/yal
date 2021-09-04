@@ -42,12 +42,10 @@ func GetConfig() *Config {
 }
 
 func InitConfig() error {
-	var username string
+	username := ""
 	// get current user name to use as default owner
 	user, err := user.Current()
-	if err != nil {
-		username = ""
-	} else {
+	if err == nil {
 		username = user.Username
 	}
 
@@ -65,7 +63,7 @@ func InitConfig() error {
 	}
 
 	// write default config to file, fail if config file already exists
-	f, err := os.OpenFile(configFilePath, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0666)
+	f, err := os.OpenFile(configFilePath, openWriteIfNotExists, 0644)
 	if err != nil {
 		return err
 	}
